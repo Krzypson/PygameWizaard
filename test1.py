@@ -31,6 +31,7 @@ fireball_movespeed=8
 
 #goblin
 Goblins=[]
+goblin_ammount = 5
 goblin_sprite = pg.image.load(os.path.join('Assets','goblin.png'))
 goblin_width,goblin_height=45,75
 goblin_graph = pg.transform.scale(goblin_sprite,(goblin_width,goblin_height))
@@ -44,6 +45,10 @@ border_bottom = screen_height - wizard_height
 #UI
 heart_icon = pg.image.load(os.path.join('Assets','hearticon.png'))
 fireball_icon = pg.image.load(os.path.join('Assets','fireballicon.png'))
+
+Goblin_Hit = pg.USEREVENT+1
+
+Player_Hit = pg.USEREVENT+2
 
 def DrawBack():
     window.fill((119,241,245))
@@ -92,18 +97,21 @@ def FireballHandling():
                 
 def SpawnGoblins():
     global Goblins
-    if(len(Goblins)<5):
-        goblin = pg.Rect(random.randint(3*screen_width//4,screen_width),random.randint(0,screen_height),goblin_width,goblin_height)
+    if(len(Goblins)<goblin_ammount):
+        goblin = pg.Rect(random.randint(3*screen_width//4,screen_width),random.randint(0,screen_height-goblin_height),goblin_width,goblin_height)
         Goblins.append(goblin)
         
 def GoblinMovement():
     global Goblins
     for goblin in Goblins:
-        goblin.x-=1
+        if goblin.colliderect(wizard):
+            pg.event.post(Player_Hit)
+        if(goblin.x > border_left):
+            goblin.x-=1
+        else:
+            Goblins.remove(goblin)
 
 def main():
-    screen_width = pg.display.Info().current_w
-    screen_height = pg.display.Info().current_h
     running = True
     while running:
         clock.tick(60)
