@@ -6,6 +6,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
 pg.init()
+pg.font.init()
 width = 1000
 height=800
 window = pg.display.set_mode((width,height),pg.RESIZABLE)
@@ -45,6 +46,8 @@ border_bottom = screen_height - wizard_height
 #UI
 heart_icon = pg.image.load(os.path.join('Assets','hearticon.png'))
 fireball_icon = pg.image.load(os.path.join('Assets','fireballicon.png'))
+score=0
+game_over_font=pg.font.SysFont('helvetica',32)
 
 Goblin_Hit = pg.USEREVENT+1
 
@@ -61,6 +64,7 @@ def DrawFireball():
     for fball in Fireballs:
         window.blit(fireball_graph,(fball.x,fball.y))
 def DrawUi():
+    game_over = game_over_font.render('GAME OVER',1,(255,0,0))
     match hearts:
         case 1:
             window.blit(heart_icon,(10,10))
@@ -71,6 +75,9 @@ def DrawUi():
             window.blit(heart_icon,(10,10))
             window.blit(heart_icon,(15+heart_icon.get_width(),10))
             window.blit(heart_icon,(20+2*heart_icon.get_width(),10))
+        #TO BE REPLACED
+        case 0:
+            window.blit(game_over,(screen_width//2,screen_height//2))
 def Draw():
     DrawBack()
     DrawWiz()
@@ -110,13 +117,19 @@ def GoblinMovement():
     global Goblins
     for goblin in Goblins:
         if goblin.colliderect(wizard):
+            Goblins.remove(goblin)
             pg.event.post(pg.event.Event(Player_Hit))
         if(goblin.x > border_left):
             goblin.x-=1
         else:
             Goblins.remove(goblin)
 
+def Wizard_Damage():
+    global hearts
+    hearts-=1
+
 def main():
+    global score
     running = True
     while running:
         clock.tick(60)
@@ -127,11 +140,16 @@ def main():
                 if(event.key == pg.K_SPACE):
                     fireball = pg.Rect(wizard.x,wizard.y,fireball_width,fireball_height)
                     Fireballs.append(fireball)
+            if(event.type == Player_Hit):
+                Wizard_Damage()
+            if(event.type == Goblin_Hit):
+                score+=1
         SpawnGoblins()
         GoblinMovement()
         WizardMovement()
         Draw()
         FireballHandling()
+        print(score)
 
 if __name__=="__main__":
     main()
