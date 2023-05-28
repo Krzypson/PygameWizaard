@@ -92,6 +92,11 @@ def FireballHandling():
         for fball in Fireballs:
             if fball.x < border_right:
                 fball.x+=fireball_movespeed
+                for goblin in Goblins:
+                    if fball.colliderect(goblin):
+                        pg.event.post(pg.event.Event(Goblin_Hit))
+                        Goblins.remove(goblin)
+                        Fireballs.remove(fball)
             else:
                 Fireballs.remove(fball)
                 
@@ -105,7 +110,7 @@ def GoblinMovement():
     global Goblins
     for goblin in Goblins:
         if goblin.colliderect(wizard):
-            pg.event.post(Player_Hit)
+            pg.event.post(pg.event.Event(Player_Hit))
         if(goblin.x > border_left):
             goblin.x-=1
         else:
