@@ -48,6 +48,7 @@ heart_icon = pg.image.load(os.path.join('Assets','hearticon.png'))
 fireball_icon = pg.image.load(os.path.join('Assets','fireballicon.png'))
 score=0
 game_over_font=pg.font.SysFont('helvetica',32)
+restart_font=pg.font.SysFont('helvetica',18)
 
 Goblin_Hit = pg.USEREVENT+1
 
@@ -66,6 +67,7 @@ def DrawFireball():
 def DrawUi():
     game_over = game_over_font.render('GAME OVER',1,(255,0,0))
     score_ui = game_over_font.render(str(score),1,(0,0,0))
+    restart_ui = restart_font.render('press r to restart',1,(0,0,0))
     window.blit(score_ui,((screen_width - score_ui.get_width())//2,10))
     match hearts:
         case 1:
@@ -80,6 +82,7 @@ def DrawUi():
         #TO BE REPLACED
         case _:
             window.blit(game_over,((screen_width-game_over.get_width())//2,screen_height//2))
+            window.blit(restart_ui,((screen_width-restart_ui.get_width())//2,screen_height//2+30))
 def Draw():
     DrawBack()
     DrawWiz()
@@ -131,10 +134,22 @@ def GoblinMovement():
 def Wizard_Damage():
     global hearts
     hearts-=1
+
+def restart():
+    global hearts
+    global Goblins
+    global score
+    global wizard
+    hearts=3
+    Goblins=[]
+    score=0
+    wizard.x = 50
+    wizard.y = 250
     
 
 def main():
     global score
+    global hearts
     running = True
     while running:
         clock.tick(60)
@@ -145,6 +160,8 @@ def main():
                 if(event.key == pg.K_SPACE and hearts>0):
                     fireball = pg.Rect(wizard.x,wizard.y,fireball_width,fireball_height)
                     Fireballs.append(fireball)
+                if(event.key == pg.K_r):
+                    restart()
             if(event.type == Player_Hit):
                 Wizard_Damage()
             if(event.type == Goblin_Hit):
