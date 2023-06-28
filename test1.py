@@ -65,6 +65,8 @@ def DrawFireball():
         window.blit(fireball_graph,(fball.x,fball.y))
 def DrawUi():
     game_over = game_over_font.render('GAME OVER',1,(255,0,0))
+    score_ui = game_over_font.render(str(score),1,(0,0,0))
+    window.blit(score_ui,((screen_width - score_ui.get_width())//2,10))
     match hearts:
         case 1:
             window.blit(heart_icon,(10,10))
@@ -76,8 +78,8 @@ def DrawUi():
             window.blit(heart_icon,(15+heart_icon.get_width(),10))
             window.blit(heart_icon,(20+2*heart_icon.get_width(),10))
         #TO BE REPLACED
-        case 0:
-            window.blit(game_over,(screen_width//2,screen_height//2))
+        case _:
+            window.blit(game_over,((screen_width-game_over.get_width())//2,screen_height//2))
 def Draw():
     DrawBack()
     DrawWiz()
@@ -115,6 +117,7 @@ def SpawnGoblins():
         
 def GoblinMovement():
     global Goblins
+    global hearts
     for goblin in Goblins:
         if goblin.colliderect(wizard):
             Goblins.remove(goblin)
@@ -123,10 +126,12 @@ def GoblinMovement():
             goblin.x-=1
         else:
             Goblins.remove(goblin)
+            hearts-=1
 
 def Wizard_Damage():
     global hearts
     hearts-=1
+    
 
 def main():
     global score
@@ -137,19 +142,20 @@ def main():
             if(event.type == pg.QUIT):
                 running = False
             if(event.type == pg.KEYDOWN):
-                if(event.key == pg.K_SPACE):
+                if(event.key == pg.K_SPACE and hearts>0):
                     fireball = pg.Rect(wizard.x,wizard.y,fireball_width,fireball_height)
                     Fireballs.append(fireball)
             if(event.type == Player_Hit):
                 Wizard_Damage()
             if(event.type == Goblin_Hit):
                 score+=1
-        SpawnGoblins()
-        GoblinMovement()
-        WizardMovement()
+        if hearts>0:
+            SpawnGoblins()
+            GoblinMovement()
+            WizardMovement()
+            FireballHandling()
+            print(score)
         Draw()
-        FireballHandling()
-        print(score)
 
 if __name__=="__main__":
     main()
